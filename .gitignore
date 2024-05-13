@@ -15,7 +15,6 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
 
 # Fortran module files
 *.mod
@@ -48,7 +47,7 @@ SourceArt/**/*.tga
 
 # Binary Files
 Binaries/*
-!Plugins/**/Binaries/*
+!Plugins/*
 
 # Builds
 Build/*
@@ -70,6 +69,9 @@ Saved/*
 # Compiled source files for the engine to use
 Intermediate/*
 Plugins/*/Intermediate/*
+
+#Dataset
+Screenshots/*
 
 # Cache files for the editor to use
 DerivedDataCache/*

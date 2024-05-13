@@ -55,6 +55,10 @@ struct FHSMCameraState
 	float fov;
 	FVector Position;
 	FRotator Rotation;
+	TArray<FString> FilePaths;
+	//Create a TArray of transforms for the camera (4x4 float matrix )
+	TArray<FMatrix> Transforms;
+
 
 
 	FHSMCameraState()

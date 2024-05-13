@@ -476,7 +476,29 @@ FHSMCameraState HSMJsonParser::GetCameraState(FString name) const {
 			cameraState.Rotation = FRotator(CurrentCameraObject->GetObjectField("rotation")->GetNumberField("p"), CurrentCameraObject->GetObjectField("rotation")->GetNumberField("y"), CurrentCameraObject->GetObjectField("rotation")->GetNumberField("r"));
 			cameraState.fov = CurrentCameraObject->GetNumberField("fov");
 			cameraState.stereo = CurrentCameraObject->GetIntegerField("stereo");
+			auto trajectories = CurrentCameraObject->GetArrayField("trajectory");
+			for (int32 j = 0; j < trajectories.Num(); ++j) {
+				auto trajectory = trajectories[j]->AsObject();
+				cameraState.FilePaths.Add(trajectory->GetStringField("file_path"));
+				/* The tranform is saved in the json like this:
+				"trajectory": [
+				{
+				  "file_path": "images/000001.jpg",
+				  "transform_matrix": [
+					[  0.9999589218549491,  -0.002219130903938475,  0.00878806353634434,  0.463642026769967],[  -0.0022415310802868346,  -0.9999942621984279,  0.002539903273341879,  2.57144443184765],[  0.00878237673433268,  -0.002559497656379054,  -0.9999581585399677,  -3.6562660783391614],[  0.0,  -0.0,  -0.0,  1.0]
+				  ]*/
 
+				FMatrix transform;
+				auto transform_matrix = trajectory->GetArrayField("transform_matrix");
+				for (int32 k = 0; k < transform_matrix.Num(); ++k) {
+					auto row = transform_matrix[k]->AsArray();
+					for (int32 l = 0; l < row.Num(); ++l) {
+						transform.M[k][l] = row[l]->AsNumber();
+					}
+				}
+				cameraState.Transforms.Add(transform);
+			}
+			
 			break;
 
 		}
