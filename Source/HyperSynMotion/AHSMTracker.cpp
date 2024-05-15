@@ -353,6 +353,33 @@ void AHSMTracker::GenerateSequenceJson()
 	HSMJsonParser::SceneTxtToJson(path, input_scene_TXT_file_name, output_scene_json_file_name);
 }
 
+void AHSMTracker::ExportMatrixArrayToJSON(FString file_path, TArray<FMatrix> matrixArray){
+
+	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+
+	//Create a Array JSON object
+	auto matrixArrayObject = TArray<TSharedPtr<FJsonValue>>();
+
+	for ( int i = 0; i < matrixArray.Num(); i++){
+		//Create a JSON value 
+		TSharedPtr<FJsonObject> matrixObject = MakeShareable(new FJsonObject());
+
+		matrixObject->SetStringField("file_path", "images/" + HSMJsonParser::IntToStringDigits(i, 6) + ".jpg");
+		matrixObject->SetArrayField("transform_matrix", HSMJsonParser::MatrixToArray(matrixArray[i]));
+		matrixArrayObject.Add(MakeShareable(new FJsonValueObject(matrixObject)));
+	}
+	JsonObject->SetArrayField("trajectory",matrixArrayObject);
+
+	// Write JSON file
+	FString text = "";
+	TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&text);
+	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+	FFileHelper::SaveStringToFile(text, *file_path, FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), EFileWrite::FILEWRITE_Append);
+
+	FString success_message("JSON file "+ file_path + " has been created successfully.");
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *success_message);
+}
+
 void AHSMTracker::ToggleRecording()
 {
 	bIsRecording = !bIsRecording;
@@ -1041,25 +1068,25 @@ void AHSMTracker::RebuildModeMain_Camera()
 		FMatrix matrix = currentCamState.Transforms[numFrame];
 		//Set the transform of the camera
 		//Multiply m14, m23 and m32 by -1 to get the correct position of the camera
-		matrix.M[0][3] = -matrix.M[0][3];
-		matrix.M[1][2] = -matrix.M[1][2];
-		matrix.M[2][1] = -matrix.M[2][1];
+		//matrix.M[0][3] = -matrix.M[0][3];
+		//matrix.M[1][2] = -matrix.M[1][2];
+		//matrix.M[2][1] = -matrix.M[2][1];
 
 
-		FMatrix transMat = matrix;
+		//FMatrix transMat = matrix;
 		matrix =  matrix.GetTransposed();
 		//Set row 1 to 0, row 2 to 1 and row 0 to 2
-		transMat.SetColumn(1, matrix.GetColumn(0));
-		transMat.SetColumn(2, matrix.GetColumn(1));
-		transMat.SetColumn(0, matrix.GetColumn(2));
-		transMat.SetColumn(3, matrix.GetColumn(3));
+		//transMat.SetColumn(1, matrix.GetColumn(0));
+		//transMat.SetColumn(2, matrix.GetColumn(1));
+		//transMat.SetColumn(0, matrix.GetColumn(2));
+		//transMat.SetColumn(3, matrix.GetColumn(3));
 
 
 		//Transpose the matrix
 		//matrix = matrix.GetTransposed();
 		FTransform transform = FTransform(matrix);
 		//change matrix positions (in m) to cm
-		transform.SetLocation(transform.GetLocation() * 100);
+		//transform.SetLocation(transform.GetLocation() * 100);
 		CameraActors[0]->GetCameraComponent()->SetWorldTransform(transform);
 		}
 	}

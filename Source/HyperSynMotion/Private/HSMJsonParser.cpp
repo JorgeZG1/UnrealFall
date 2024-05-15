@@ -211,6 +211,20 @@ float FloatTxt(FString txt_string)
 	return res;
 }
 
+TArray<TSharedPtr<FJsonValue>>  HSMJsonParser::MatrixToArray(FMatrix matrix) {
+	TArray<TSharedPtr<FJsonValue>> matrixArray;
+		 for (int32 i = 0; i < 4; ++i) {
+			 TArray<TSharedPtr<FJsonValue>> rowArray;
+				 for (int32 j = 0; j < 4; ++j) {
+					 rowArray.Add(MakeShareable(new FJsonValueNumber(matrix.M[i][j])));
+				 }
+			 matrixArray.Add(MakeShareable(new FJsonValueArray(rowArray)));
+		}
+	 return matrixArray;
+ 
+ }
+
+
 void HSMJsonParser::SceneTxtToJson(FString path, FString txt_filename, FString json_filename)
 {
 	FString txt_file;

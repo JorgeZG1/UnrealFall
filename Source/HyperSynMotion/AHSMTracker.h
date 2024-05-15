@@ -243,6 +243,9 @@ public:
 	UFUNCTION(CallInEditor, BlueprintCallable, Category="JSON Management")
 	void GenerateSequenceJson();
 
+	UFUNCTION(CallInEditor, BlueprintCallable, Category = "JSON Management")
+	void ExportMatrixArrayToJSON(FString file_path, TArray<FMatrix> matrixArray);
+
 	FORCEINLINE bool GetMode() const
 	{
 		return bRecordMode;

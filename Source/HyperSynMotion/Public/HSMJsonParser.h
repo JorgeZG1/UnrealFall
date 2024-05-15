@@ -93,6 +93,7 @@ public:
 	bool LoadFile(FString filename);
 	FHSMFrame GetFrameData(uint64 nFrame);
 	static FString IntToStringDigits(int i, int nDigits);
+	static TArray<TSharedPtr<FJsonValue>> MatrixToArray(FMatrix matrix);
 	static void SceneTxtToJson(FString path, FString txt_filename, FString json_filename);
 
 	FORCEINLINE uint64 GetNumFrames() const
