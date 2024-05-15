@@ -8,7 +8,7 @@ public class AnimNodeEditor : ModuleRules
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
-				"AnimNodeEditor/Public"
+				//"AnimNodeEditor/Public"
 				// ... add public include paths required here ...
 			}
 			);
@@ -16,7 +16,7 @@ public class AnimNodeEditor : ModuleRules
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
-				"AnimNodeEditor/Private",
+				//"AnimNodeEditor/Private",
 				// ... add other private include paths required here ...
 			}
 			);

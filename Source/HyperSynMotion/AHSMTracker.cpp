@@ -144,6 +144,14 @@ void AHSMTracker::BeginPlay()
 	EHSMViewMode_First = EHSMViewModeList[0];
 	EHSMViewMode_Last = EHSMViewModeList.Last();
 
+	if (bDebugMode) {
+		initial_delay = 1.0;
+		place_cameras_delay = 0.1;
+		first_viewmode_of_frame_delay = 0.05;
+		change_viewmode_delay = 0.3;
+		take_screenshot_delay = 0.1;
+	}
+
 
 	if (!bRecordMode)
 	{
@@ -822,7 +830,7 @@ void AHSMTracker::ChangeViewmodeDelegate(EHSMViewMode vm)
 	 //Get player controller and set view target to the first camera from ControllerPawn and CameraActors[CurrentCamRebuildMode]
 	 auto playerController = GetWorld()->GetFirstPlayerController();
 	 //check that player controller is valid
-	 if (playerController) {
+	 if (playerController && !bDebugMode) {
 		 playerController->SetViewTarget(CameraActors[CurrentCamRebuildMode]);
 	 }
 
@@ -837,7 +845,10 @@ void AHSMTracker::ChangeViewmodeDelegate(EHSMViewMode vm)
 void AHSMTracker::TakeScreenshotDelegate(EHSMViewMode vm)
 {
 	FTimerHandle TimerHandle;
-	TakeScreenshotFolder(vm, CameraActors[CurrentCamRebuildMode]->GetActorLabel());
+
+	if (true || !bDebugMode) {
+		TakeScreenshotFolder(vm, CameraActors[CurrentCamRebuildMode]->GetActorLabel());
+	}
 
 	if (vm == EHSMViewMode_Last)
 	{
@@ -959,7 +970,7 @@ void AHSMTracker::RebuildModeBegin()
 
 void AHSMTracker::RebuildModeMain()
 {
-	if (numFrame < JsonParser->GetNumFrames() && ( JsonParser->GetAnimationNames().Num() == 0 || animLength > numFrame / fps_anim  )){ //Check if the animation is finished or if the animation is not valid
+	if (numFrame < JsonParser->GetNumFrames() && numFrame < currentCamState.Transforms.Num() && (JsonParser->GetAnimationNames().Num() == 0 || animLength > numFrame / fps_anim)) { //Check if the animation is finished or if the animation is not valid
 		int64 currentTime = FDateTime::Now().ToUnixTimestamp();
 		PrintStatusToLog(start_frames[CurrentJsonFile], JsonReadStartTime, LastFrameTime, numFrame, currentTime, JsonParser->GetNumFrames());
 		LastFrameTime = currentTime;
@@ -1029,8 +1040,27 @@ void AHSMTracker::RebuildModeMain_Camera()
 		
 		FMatrix matrix = currentCamState.Transforms[numFrame];
 		//Set the transform of the camera
+		//Multiply m14, m23 and m32 by -1 to get the correct position of the camera
+		matrix.M[0][3] = -matrix.M[0][3];
+		matrix.M[1][2] = -matrix.M[1][2];
+		matrix.M[2][1] = -matrix.M[2][1];
+
+
+		FMatrix transMat = matrix;
+		matrix =  matrix.GetTransposed();
+		//Set row 1 to 0, row 2 to 1 and row 0 to 2
+		transMat.SetColumn(1, matrix.GetColumn(0));
+		transMat.SetColumn(2, matrix.GetColumn(1));
+		transMat.SetColumn(0, matrix.GetColumn(2));
+		transMat.SetColumn(3, matrix.GetColumn(3));
+
+
+		//Transpose the matrix
+		//matrix = matrix.GetTransposed();
 		FTransform transform = FTransform(matrix);
-		CameraActors[0]->SetActorTransform(transform);
+		//change matrix positions (in m) to cm
+		transform.SetLocation(transform.GetLocation() * 100);
+		CameraActors[0]->GetCameraComponent()->SetWorldTransform(transform);
 		}
 	}
 

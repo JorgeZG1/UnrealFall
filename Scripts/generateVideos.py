@@ -12,10 +12,10 @@ import time
 from tqdm import tqdm
 
 # The parent directory of this file location + /Screenshots
-dir_path = os.path.dirname(os.path.realpath(__file__)) + "/../Nuevos"
+dir_path = os.path.dirname(os.path.realpath(__file__)) + "/../Screenshots"
 dir_path = os.path.normpath(dir_path)
 print("Looking for images in dir_path: " + dir_path)
-output_dir_path = "C:/Users/david/Desktop/animaciones paper/video"
+output_dir_path = "C:/Users/david/Desktop/UnrealFallDev/UnrealFall/Videos"
 
 def generateVideoFromImages(folder, outputFolder, fps, width, height, extension):
     #print("Generating video from images in folder: " + folder)
