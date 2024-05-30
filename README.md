@@ -7,7 +7,7 @@
 
 ## Synthetic video generation framework
 
-<img src="assets/UnrealFall.png">
+<img src="Assets/UnrealFall.png">
  
 </div>
 
