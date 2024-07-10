@@ -976,8 +976,9 @@ void AHSMTracker::RebuildModeBegin()
 	for (ACameraActor* cam : CameraActors){
 		FString camName = cam->GetActorLabel();
 		FHSMCameraState CamState = JsonParser->GetCameraState(camName);
-		if(CameraActors.Num() == 1)
+		if (CameraActors.Num() == 1) 
 			currentCamState = CamState;
+		
 		// check if CamState has valid values of position and rotation variables
 		if (CamState.Position != FVector::ZeroVector && CamState.Rotation != FRotator::ZeroRotator)
 		{
@@ -997,7 +998,9 @@ void AHSMTracker::RebuildModeBegin()
 
 void AHSMTracker::RebuildModeMain()
 {
-	if (numFrame < JsonParser->GetNumFrames() && numFrame < currentCamState.Transforms.Num() && (JsonParser->GetAnimationNames().Num() == 0 || animLength > numFrame / fps_anim)) { //Check if the animation is finished or if the animation is not valid
+	//se ha eliminado la condición de las transfornaciones ya que hay 5 cámaras y currentcamstate solo tiene valor si hay una cámra ( hay 5 en la escena )
+	//numFrame < currentCamState.Transforms.Num()
+	if (numFrame < JsonParser->GetNumFrames() && (JsonParser->GetAnimationNames().Num() == 0 || animLength > numFrame / fps_anim)) { //Check if the animation is finished or if the animation is not valid
 		int64 currentTime = FDateTime::Now().ToUnixTimestamp();
 		PrintStatusToLog(start_frames[CurrentJsonFile], JsonReadStartTime, LastFrameTime, numFrame, currentTime, JsonParser->GetNumFrames());
 		LastFrameTime = currentTime;
