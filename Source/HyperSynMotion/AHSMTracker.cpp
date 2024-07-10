@@ -119,6 +119,7 @@ void AHSMTracker::BeginPlay()
 
 	for (APawn* pawn : Pawns)
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("%s"),*pawn->GetFName().ToString());
 		// pawn->InitFromTracker(bRecordMode, bDebugMode, this); UE4
 		ViewTargets.Add(pawn);
 
