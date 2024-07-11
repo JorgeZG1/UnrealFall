@@ -925,6 +925,7 @@ void AHSMTracker::RebuildModeBegin()
 	// Initialize Pawns in scene
 	for (APawn* sk : Pawns){
 		FString skName = sk->GetActorLabel();
+		UE_LOG(LogTemp, Warning, TEXT("Name of Pawn: %s"), *skName);
 		FHSMSkeletonState SkState = JsonParser->GetSkeletonState(skName);
 		// check if SkState has valid values of position and rotation variables
 		if (SkState.Position != FVector::ZeroVector && SkState.Rotation != FRotator::ZeroRotator)
@@ -935,6 +936,7 @@ void AHSMTracker::RebuildModeBegin()
 
 			//Get animation from the jsonparser
 			FString animationName = JsonParser->GetAnimationNames()[0];
+			UE_LOG(LogTemp, Warning, TEXT("Name of Animation: %s"), *animationName);
 			//Get the animationn object from the game with the name animationName
 			UAnimSequence* anim = Cast<UAnimSequence>(StaticLoadObject(UAnimSequence::StaticClass(), NULL, *(animationName)));
 			//Check if the animation is valid
@@ -976,6 +978,7 @@ void AHSMTracker::RebuildModeBegin()
 	// Initialize Cameras in scene
 	for (ACameraActor* cam : CameraActors){
 		FString camName = cam->GetActorLabel();
+		UE_LOG(LogTemp, Warning, TEXT("Name of Camera: %s"), *camName);
 		FHSMCameraState CamState = JsonParser->GetCameraState(camName);
 		if (CameraActors.Num() == 1) 
 			currentCamState = CamState;
