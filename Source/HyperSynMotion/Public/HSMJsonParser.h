@@ -133,6 +133,7 @@ public:
 
 	FHSMSkeletonState GetSkeletonState(FString name) const;
 	FHSMCameraState GetCameraState(FString name) const;
+	FString GetAnimationName(FString name) const;
 	
 
 
@@ -145,8 +146,10 @@ protected:
 	TArray<FString> PawnNames;
 	TArray<FString> CameraNames;
 	TArray<FString> AnimationNames;
+
+	TArray<std::pair<FString, FString>> AnimationsArray;
 	TArray<TSharedPtr<FJsonValue>> CamerasJsonArray;
 	TArray<TSharedPtr<FJsonValue>> FramesJsonArray;
-	TArray<TSharedPtr<FJsonValue>> PawnsJsonArray;
+	TArray<std::pair<TSharedPtr<FJsonValue>, FString>> PawnsJsonArray;
 
 };

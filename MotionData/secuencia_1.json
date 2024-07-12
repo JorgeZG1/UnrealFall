@@ -1,6 +1,6 @@
 {
     "name": "Anim Man 1 and Woman 2",
-    "total_frames": 4,
+    "total_frames": 119,
     "cameras": [
         {
             "name": "Camera1",
@@ -94,16 +94,16 @@
     ],
     "avatares":[
         {
-            "name": "BP_SLFMMetaHuman_woman_1",
+            "name": "BP_SLFMMetaHuman_man_1",
             "animation": "/Script/Engine.AnimSequence'/Game/Motion/511_An_elderly_person_experiencing_dizziness_and_loss_of_balance__and_falls_down_to_the_ground.511_An_elderly_person_experiencing_dizziness_and_loss_of_balance__and_falls_down_to_the_ground'",
             "skeleton": 
             {
                 "num_bones": 24,
                 "position":
                 {
-                    "x": 592.25,
-                    "y": -351.26,
-                    "z": -10
+                    "x": 613.85,
+                    "y": -221.29,
+                    "z": 92.63
                 },
                 "rotation":
                 {
@@ -114,16 +114,16 @@
             }
         },
         {
-            "name": "BP_SLFMMetaHuman_man_2",
+            "name": "BP_SLFMMetaHuman_woman_2",
             "animation": "/Script/Engine.AnimSequence'/Game/Motion/511_An_elderly_person_experiencing_dizziness_and_loss_of_balance__and_falls_down_to_the_ground.511_An_elderly_person_experiencing_dizziness_and_loss_of_balance__and_falls_down_to_the_ground'",	
             "skeleton": 
             {
                 "num_bones": 24,
                 "position":
                 {
-                    "x": 672.25,
-                    "y": -351.26,
-                    "z": -10
+                    "x": 713.85,
+                    "y": -221.29,
+                    "z": 92.63
                 },
                 "rotation":
                 {

@@ -180,7 +180,7 @@ protected:
 	HSMJsonParser* JsonParser;
 	FHSMFrame currentFrame;
 	FHSMCameraState currentCamState;
-	USkeletalMeshComponent* pawnMesh;
+	TArray<USkeletalMeshComponent*> pawnMeshArray;
 	float animLength;
 
 private:

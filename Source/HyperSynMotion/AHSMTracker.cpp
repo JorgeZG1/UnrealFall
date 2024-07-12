@@ -902,10 +902,13 @@ void AHSMTracker::RebuildModeBegin()
 {
 	if (CurrentJsonFile < start_frames.Num())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("MENOR QUE START FRAMESSSSSSSS"));
 		numFrame = start_frames[CurrentJsonFile];
+		UE_LOG(LogTemp, Warning, TEXT("NUMFRAME XD: %i"), numFrame);
 	}
 	else
 	{
+		UE_LOG(LogTemp, Warning, TEXT("IGUAL O MAYOR QUE START FRAMESSSSS"));
 		numFrame = 0;
 	}
 
@@ -935,7 +938,7 @@ void AHSMTracker::RebuildModeBegin()
 			sk->SetActorHiddenInGame(false);
 
 			//Get animation from the jsonparser
-			FString animationName = JsonParser->GetAnimationNames()[0];
+			FString animationName = JsonParser->GetAnimationName(skName);
 			UE_LOG(LogTemp, Warning, TEXT("Name of Animation: %s"), *animationName);
 			//Get the animationn object from the game with the name animationName
 			UAnimSequence* anim = Cast<UAnimSequence>(StaticLoadObject(UAnimSequence::StaticClass(), NULL, *(animationName)));
@@ -945,8 +948,12 @@ void AHSMTracker::RebuildModeBegin()
 				UActorComponent* animMesh = sk->GetComponentByClass(USkeletalMeshComponent::StaticClass());
 				//Check if the animation mesh is valid
 				if (animMesh != nullptr) {
-					pawnMesh = Cast<USkeletalMeshComponent>(animMesh);
+					/*pawnMesh = Cast<USkeletalMeshComponent>(animMesh);*/
+					USkeletalMeshComponent* pawnMesh = Cast<USkeletalMeshComponent>(animMesh);
 					if (pawnMesh != nullptr) {
+						UE_LOG(LogTemp, Warning, TEXT("%s with Animation: %s es válida"), *skName,*animationName);
+						//add to array
+						pawnMeshArray.Add(pawnMesh);
 						//pawnMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
 						pawnMesh->SetAnimation(anim);
 						//Get size of anim
@@ -1010,20 +1017,28 @@ void AHSMTracker::RebuildModeMain()
 		LastFrameTime = currentTime;
 
 		//currentFrame = JsonParser->GetFrameData(numFrame);
+		
+		//update all meshes positions
+		for (USkeletalMeshComponent* pawnMesh : pawnMeshArray) {
+			if (pawnMesh != nullptr) {
+				float framePos = (float)numFrame / fps_anim;
+				pawnMesh->SetPosition(framePos, false);
+			}
+		}
 
-		if (pawnMesh != nullptr) {
+		/*if (pawnMesh != nullptr) {*/
 			//Check size of the animation of pawnMesh
 			//Set initial position of frame numFrame of the animation taking into account the fps_anim and refresh the mesh
 			//pawnMesh->SetUpdateAnimationInEditor(true);
-			float framePos = (float)numFrame / fps_anim;
-			pawnMesh->SetPosition(framePos, false);
+			/*float framePos = (float)numFrame / fps_anim;
+			pawnMesh->SetPosition(framePos, false);*/
 			//pawnMesh->RefreshBoneTransforms();
 			// print pawnMesh->GetPosition()
 			//UE_LOG(LogTemp, Warning, TEXT("Position of pawnMesh: %f"), pawnMesh->GetPosition());
 			//To solve problems about no updates of the animation in the editor
 			//pawnMesh->TickAnimation(0.0f, false);
 			//pawnMesh->TickPose(0.0f, false);
-		}
+		/*}*/
 
 
 		// Rebuild Pawns animation

@@ -30,23 +30,38 @@ bool HSMJsonParser::LoadFile(FString JsonFilePath)
 
 		if (FJsonSerializer::Deserialize(JsonReader, JsonObject) && JsonObject.IsValid())
 		{
+			//Get sequence data
+
+			//sequence name
+			SequenceName = JsonObject->GetStringField("name");
+			
+			//sequence numframes
+			NumFrames = JsonObject->GetIntegerField("total_frames");
+			UE_LOG(LogTemp, Warning, TEXT("NumFrames: %i"), NumFrames);
+
+			//sequence cameras
+			CamerasJsonArray = JsonObject->GetArrayField("cameras");
+
+			//sequence avatares
 			auto AvataresJsonArray = JsonObject->GetArrayField("avatares");
 
 			for (int32 i = 0; i < AvataresJsonArray.Num(); ++i)
 			{
+				//for each avatar
 				TSharedPtr<FJsonObject> AvatarObject = AvataresJsonArray[i]->AsObject();
 
-				NumFrames = AvatarObject->GetIntegerField("total_frames");
+				//name
+				auto avatar_name = AvatarObject->GetStringField("name");
+				//animation
+				auto animation_name = AvatarObject->GetStringField("animation");
+				//add animation with asociate pawn
+				AnimationsArray.Add(std::make_pair(animation_name,avatar_name));
 
-				SequenceName = AvatarObject->GetStringField("name");
-
-				CamerasJsonArray = AvatarObject->GetArrayField("cameras");
-
-				//add skeleton to pawn array
+				//Skeleton bones, position and rotation
 				auto CurrentSkeleton = AvatarObject->GetObjectField("skeleton");
-				PawnsJsonArray.Add( MakeShareable(new FJsonValueObject(CurrentSkeleton)) );
-
-				auto AnimationsJsonArray = AvatarObject->GetArrayField("animations");
+				auto sk_pair = std::make_pair(MakeShareable(new FJsonValueObject(CurrentSkeleton)), avatar_name);
+				//add skeleton with asociate pawn
+				PawnsJsonArray.Add(sk_pair);
 
 				TSharedPtr<FJsonObject> CurrentCameraObject;
 				for (int32 j = 0; j < CamerasJsonArray.Num(); ++j)
@@ -55,19 +70,21 @@ bool HSMJsonParser::LoadFile(FString JsonFilePath)
 					CameraNames.Add(CurrentCameraObject->GetStringField("name"));
 				}
 
-				TSharedPtr<FJsonObject> CurrentPawnObject;
+				/*TSharedPtr<FJsonObject> CurrentPawnObject;
 				for (int32 j = 0; j < PawnsJsonArray.Num(); ++j)
 				{
 					CurrentPawnObject = PawnsJsonArray[j]->AsObject();
 					PawnNames.Add(CurrentPawnObject->GetStringField("name"));
-				}
+				}*/
+				PawnNames.Add(avatar_name);
 
-				TSharedPtr<FJsonObject> CurrentAnimationObject;
+				/*TSharedPtr<FJsonObject> CurrentAnimationObject;
 				for (int32 j = 0; j < AnimationsJsonArray.Num(); ++j)
 				{
 					CurrentAnimationObject = AnimationsJsonArray[j]->AsObject();
 					AnimationNames.Add(CurrentAnimationObject->GetStringField("name"));
-				}
+				}*/
+				AnimationNames.Add(animation_name);
 			}
 		}
 		else
@@ -460,8 +477,8 @@ FHSMSkeletonState HSMJsonParser::GetSkeletonState(FString name) const{
 
 	for (int32 i = 0; i < PawnsJsonArray.Num(); ++i)
 	{
-		CurrentPawnObject = PawnsJsonArray[i]->AsObject();
-		if (CurrentPawnObject->GetStringField("name") == name){
+		CurrentPawnObject = PawnsJsonArray[i].first->AsObject();
+		if (PawnsJsonArray[i].second == name) {
 			UE_LOG(LogTemp, Warning, TEXT("Pawn in avatares json: %s"), *name);
 		
 			skeletonState.Position = FVector(CurrentPawnObject->GetObjectField("position")->GetNumberField("x"), CurrentPawnObject->GetObjectField("position")->GetNumberField("y"), CurrentPawnObject->GetObjectField("position")->GetNumberField("z"));
@@ -537,3 +554,15 @@ FHSMCameraState HSMJsonParser::GetCameraState(FString name) const {
 	return cameraState;
 
 }
+
+FString HSMJsonParser::GetAnimationName(FString name) const
+{
+	for (auto anim : AnimationsArray)
+	{
+		if (anim.second == name)
+			return anim.first;
+	}
+	return "Pawn not finded";
+}
+
+
