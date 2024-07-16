@@ -43,7 +43,7 @@ bool HSMJsonParser::LoadFile(FString JsonFilePath)
 			CamerasJsonArray = JsonObject->GetArrayField("cameras");
 
 			//sequence avatares
-			auto AvataresJsonArray = JsonObject->GetArrayField("avatares");
+			auto AvataresJsonArray = JsonObject->GetArrayField("avatars");
 
 			for (int32 i = 0; i < AvataresJsonArray.Num(); ++i)
 			{
@@ -97,6 +97,183 @@ bool HSMJsonParser::LoadFile(FString JsonFilePath)
 		UE_LOG(LogTemp, Warning, TEXT("JSON couldn't be read."));
 	}
 
+	return file_loaded;
+}
+
+bool HSMJsonParser::LoadSceneFile(FString JsonFilePath, UObject* hsmtracker)
+{
+	bool file_loaded = false;
+	FString JsonRaw;
+	file_loaded = FFileHelper::LoadFileToString(JsonRaw, *JsonFilePath);
+
+	if (file_loaded)
+	{
+		TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
+		TSharedRef<TJsonReader<TCHAR>> JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonRaw);
+
+		if (FJsonSerializer::Deserialize(JsonReader, JsonObject) && JsonObject.IsValid())
+		{
+			// Extract the name of the blueprint
+			FString BlueprintPath = JsonObject->GetObjectField("scene")->GetStringField("name");
+
+			// Load the Blueprint class
+			UObject* BlueprintObj = StaticLoadObject(UObject::StaticClass(), nullptr, *BlueprintPath);
+
+			if (BlueprintObj)
+			{
+				UBlueprint* Blueprint = Cast<UBlueprint>(BlueprintObj);
+				if (Blueprint && Blueprint->GeneratedClass)
+				{
+					UClass* SpawnClass = Blueprint->GeneratedClass;
+
+					//Get World
+					UWorld* world = GEngine->GetWorldFromContextObjectChecked(hsmtracker);
+					if (world)
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Scene charged corretly with world context!"));
+						// Extract position, scale, and rotation from JSON
+						FVector Position = FVector(
+							JsonObject->GetObjectField("scene")->GetObjectField("position")->GetNumberField("x"),
+							JsonObject->GetObjectField("scene")->GetObjectField("position")->GetNumberField("y"),
+							JsonObject->GetObjectField("scene")->GetObjectField("position")->GetNumberField("z")
+						);
+
+						FVector Scale = FVector(
+							JsonObject->GetObjectField("scene")->GetObjectField("scale")->GetNumberField("x"),
+							JsonObject->GetObjectField("scene")->GetObjectField("scale")->GetNumberField("y"),
+							JsonObject->GetObjectField("scene")->GetObjectField("scale")->GetNumberField("z")
+						);
+
+						FRotator Rotation = FRotator(
+							JsonObject->GetObjectField("scene")->GetObjectField("rotation")->GetNumberField("x"),
+							JsonObject->GetObjectField("scene")->GetObjectField("rotation")->GetNumberField("y"),
+							JsonObject->GetObjectField("scene")->GetObjectField("rotation")->GetNumberField("z")
+						);
+
+						// Spawn the actor in the world
+						FActorSpawnParameters SpawnParams;
+						AActor* SpawnedActor = world->SpawnActor<AActor>(SpawnClass, Position, Rotation, SpawnParams);
+						if (SpawnedActor)
+						{
+							UE_LOG(LogTemp, Warning, TEXT("Actor spawned successfully!"));
+
+							// Set scale
+							SpawnedActor->SetActorScale3D(Scale);
+
+							//<ONLY FOR DEBUG---------------------------------------------------------------------------------------->
+							// obtein actor class to print components and properties
+							UClass* ActorClass = SpawnedActor->GetClass();
+							TSet<UActorComponent*> Components = SpawnedActor->GetComponents();
+							for (UActorComponent* Component : Components)
+							{
+								if (Component)
+								{
+									// print name and component type
+									UE_LOG(LogTemp, Warning, TEXT("Component Name: %s, Component Class: %s"),
+										*Component->GetName(),
+										*Component->GetClass()->GetName());
+									// obtein component class
+									UClass* ComponentClass = Component->GetClass();
+
+									// loop properties
+									for (TFieldIterator<FProperty> PropIt(ComponentClass); PropIt; ++PropIt)
+									{
+										FProperty* Property = *PropIt;
+										FString PropertyName = Property->GetName();
+										FString PropertyValue;
+
+										// get propertie value in string 
+										Property->ExportText_InContainer(0, PropertyValue, Component, Component, Component, PPF_None);
+
+										// print name and value
+										UE_LOG(LogTemp, Warning, TEXT("    Property Name: %s, Property Value: %s"),
+											*PropertyName,
+											*PropertyValue);
+									}
+								}
+							}
+							//print ActorClass properties -> hear are crop properties located
+							for (TFieldIterator<FProperty> PropIt(ActorClass); PropIt; ++PropIt)
+							{
+								FProperty* Property = *PropIt;
+								if (Property) {
+									// Obtener el nombre de la propiedad
+									FString PropertyName = Property->GetName();
+									UE_LOG(LogTemp, Warning, TEXT("property: %s"), *PropertyName);
+								}
+							}
+							//<ONLY FOR DEBUG---------------------------------------------------------------------------------------->
+
+							/*int32 properties = SpawnedActor->GetClass()->PropertiesSize;
+							UE_LOG(LogTemp, Warning, TEXT("num properties: %i"), properties);*/
+
+							// get crop properties by name
+							FProperty* CropMin = SpawnedActor->GetClass()->FindPropertyByName("CropMin");
+							FProperty* CropMax = SpawnedActor->GetClass()->FindPropertyByName("CropMax");
+							FProperty* CropCenter = SpawnedActor->GetClass()->FindPropertyByName("CropCenter");
+							FProperty* CropRotation = SpawnedActor->GetClass()->FindPropertyByName("CropRotation");
+							if (CropMin && CropMax && CropCenter && CropRotation)
+							{
+								//verify if FStructProperty and data structure is FVector
+								if (FStructProperty* StructProp = CastField<FStructProperty>(CropMin))
+								{
+									UE_LOG(LogTemp, Warning, TEXT("property: %s"), *StructProp->Struct->GetFName().ToString());
+									if (StructProp->Struct->GetFName() == "Vector3f")
+									{
+										UE_LOG(LogTemp, Warning, TEXT("Si es un FVEctor3f"));
+									}
+								}
+
+								//Set crop min property
+								FVector3f cropmin_value = FVector3f(
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bouding_box_min")->GetNumberField("x"),
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bouding_box_min")->GetNumberField("y"),
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bouding_box_min")->GetNumberField("z")
+								);
+								void* CropMinAddress = CropMin->ContainerPtrToValuePtr<void>(SpawnedActor);
+								FVector3f* CropMinVector = reinterpret_cast<FVector3f*>(CropMinAddress);
+								*CropMinVector = cropmin_value;
+
+								//Set crop max property
+								FVector3f cropmax_value = FVector3f(
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bouding_box_max")->GetNumberField("x"),
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bouding_box_max")->GetNumberField("y"),
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bouding_box_max")->GetNumberField("z")
+								);
+								void* CropMaxAddress = CropMax->ContainerPtrToValuePtr<void>(SpawnedActor);
+								FVector3f* CropMaxVector = reinterpret_cast<FVector3f*>(CropMaxAddress);
+								*CropMaxVector = cropmax_value;
+
+								//Set crop center property
+								FVector3f cropcenter_value = FVector3f(
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bounding_center")->GetNumberField("x"),
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bounding_center")->GetNumberField("y"),
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bounding_center")->GetNumberField("z")
+								);
+								void* CropCenterAdress = CropCenter->ContainerPtrToValuePtr<void>(SpawnedActor);
+								FVector3f* CropCenterVector = reinterpret_cast<FVector3f*>(CropCenterAdress);
+								*CropCenterVector = cropcenter_value;
+
+								//Set crop rotation property
+								FRotator3d croprotation_value = FRotator3d(
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_rotation")->GetNumberField("x"),
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_rotation")->GetNumberField("y"),
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_rotation")->GetNumberField("z")
+								);
+								void* CropRotationAddress = CropRotation->ContainerPtrToValuePtr<void>(SpawnedActor);
+								FRotator3d* CropRotationVector = reinterpret_cast<FRotator3d*>(CropRotationAddress);
+								*CropRotationVector = croprotation_value;
+
+								/*SpawnedActor->MarkComponentsRenderStateDirty();*/
+								//SpawnedActor->PostInitProperties();
+								UE_LOG(LogTemp, Warning, TEXT("property: %s"), *CropCenter->GetCPPType());
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	return file_loaded;
 }
 

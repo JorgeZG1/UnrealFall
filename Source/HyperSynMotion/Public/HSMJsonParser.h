@@ -91,6 +91,7 @@ public:
 	~HSMJsonParser();
 
 	bool LoadFile(FString filename);
+	bool LoadSceneFile(FString filename,UObject* hsmtracker);
 	FHSMFrame GetFrameData(uint64 nFrame);
 	static FString IntToStringDigits(int i, int nDigits);
 	static TArray<TSharedPtr<FJsonValue>> MatrixToArray(FMatrix matrix);

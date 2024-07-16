@@ -923,7 +923,14 @@ void AHSMTracker::RebuildModeBegin()
 	JsonParser->LoadFile(scene_save_directory + scene_folder + "/" + json_file_names[CurrentJsonFile] + ".json");
 	//CacheSceneActors(JsonParser->GetPawnNames(), JsonParser->GetCameraNames());
 	DisableGravity();
-
+	
+	// Initialize scene (gaussian splat)
+	if (!scene_charged)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SPAWNEANDO LA ESCENA"));
+		scene_charged = JsonParser->LoadSceneFile(scene_save_directory + scene_folder + "/" + "scene_data.json",this);
+		//UE_LOG(LogTemp, Warning, TEXT("Scene chargeg value is: %s"), scene_charged ? TEXT("true") : TEXT("false"));
+	}
 
 	// Initialize Pawns in scene
 	for (APawn* sk : Pawns){

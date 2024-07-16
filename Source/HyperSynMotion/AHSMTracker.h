@@ -190,6 +190,8 @@ private:
 	/* Flag for avoiding write header several times when appending to the same file. By default appends will not happen. */
 	bool fileHeaderWritten;
 
+	//Flag to know if scene is already charged
+	bool scene_charged{false};
 
 protected:
 	// Called when the game starts or when spawned
