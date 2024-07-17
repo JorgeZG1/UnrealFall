@@ -264,9 +264,36 @@ bool HSMJsonParser::LoadSceneFile(FString JsonFilePath, UObject* hsmtracker)
 								FRotator3d* CropRotationVector = reinterpret_cast<FRotator3d*>(CropRotationAddress);
 								*CropRotationVector = croprotation_value;
 
-								/*SpawnedActor->MarkComponentsRenderStateDirty();*/
-								//SpawnedActor->PostInitProperties();
-								UE_LOG(LogTemp, Warning, TEXT("property: %s"), *CropCenter->GetCPPType());
+								/*SpawnedActor->MarkComponentsRenderStateDirty();
+								SpawnedActor->ReregisterAllComponents();*/
+
+								// Crear y configurar un FPropertyChangedChainEvent
+								/*FEditPropertyChain PropertyChain;
+								PropertyChain.AddHead(CropMin);
+								PropertyChain.SetActivePropertyNode(CropMin);
+
+								FPropertyChangedChainEvent PropertyChangedEvent(PropertyChain);
+								SpawnedActor->PostEditChangeChainProperty(PropertyChangedEvent);*/
+
+								// Reload properties in editor
+								FPropertyChangedEvent PropertyChangedEvent(CropMin);
+								SpawnedActor->PostEditChangeProperty(PropertyChangedEvent);
+								FPropertyChangedEvent PropertyChangedEvent1(CropMax);
+								SpawnedActor->PostEditChangeProperty(PropertyChangedEvent1);
+								FPropertyChangedEvent PropertyChangedEvent2(CropCenter);
+								SpawnedActor->PostEditChangeProperty(PropertyChangedEvent2);
+								FPropertyChangedEvent PropertyChangedEvent3(CropRotation);
+								SpawnedActor->PostEditChangeProperty(PropertyChangedEvent3);
+
+								/*world->GetCurrentLevel()->MarkLevelComponentsRenderStateDirty();
+
+								SpawnedActor->PostInitProperties();
+								SpawnedActor->Reset();
+
+								world->GetCurrentLevel()->ReloadConfig();*/
+								/*MarkComponentsRender*/
+								/*SpawnedActor->ReloadConfig();*/
+								UE_LOG(LogTemp, Warning, TEXT("LLEGO AL FINAL"));
 							}
 						}
 					}
