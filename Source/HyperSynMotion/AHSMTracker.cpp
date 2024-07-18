@@ -893,6 +893,8 @@ void AHSMTracker::TakeScreenshotDelegate(EHSMViewMode vm)
 	else
 	{
 		EHSMViewMode NextVM = NextViewmode(vm);
+		UE_LOG(LogTemp, Warning, TEXT("CURRENT VIEWMODE: %s"), *ViewmodeString(vm));
+		UE_LOG(LogTemp, Warning, TEXT("NEXT VIEWMODE: %s"), *ViewmodeString(NextVM));
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateUObject(this, &AHSMTracker::ChangeViewmodeDelegate, NextVM), change_viewmode_delay, false);
 	}
 }
@@ -997,7 +999,8 @@ void AHSMTracker::RebuildModeBegin()
 
 void AHSMTracker::RebuildModeMain()
 {
-	if (numFrame < JsonParser->GetNumFrames() && numFrame < currentCamState.Transforms.Num() && (JsonParser->GetAnimationNames().Num() == 0 || animLength > numFrame / fps_anim)) { //Check if the animation is finished or if the animation is not valid
+	//numFrame < currentCamState.Transforms.Num() && 
+	if (numFrame < JsonParser->GetNumFrames() && (JsonParser->GetAnimationNames().Num() == 0 || animLength > numFrame / fps_anim)) { //Check if the animation is finished or if the animation is not valid
 		int64 currentTime = FDateTime::Now().ToUnixTimestamp();
 		PrintStatusToLog(start_frames[CurrentJsonFile], JsonReadStartTime, LastFrameTime, numFrame, currentTime, JsonParser->GetNumFrames());
 		LastFrameTime = currentTime;
