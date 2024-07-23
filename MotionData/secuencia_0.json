@@ -95,7 +95,7 @@
     "avatars":[
         {
             "name": "BP_SLFMMetaHuman_woman_1",
-            "animation": "/Script/Engine.AnimSequence'/Game/Motion/511_An_elderly_person_experiencing_dizziness_and_loss_of_balance__and_falls_down_to_the_ground.511_An_elderly_person_experiencing_dizziness_and_loss_of_balance__and_falls_down_to_the_ground'",
+            "animation": "/Script/Engine.AnimSequence'/Game/Motion/190_A_person_is_walking_forwards__but_slips_on_a_patch_of_ice_and_has_a_back_fall.190_A_person_is_walking_forwards__but_slips_on_a_patch_of_ice_and_has_a_back_fall'",
             "skeleton": 
             {
                 "num_bones": 24,
