@@ -99,6 +99,7 @@ LastFrameTime(0)
 	json_file_names.Add("scene");
 	start_frames.Add(0);
 	scene_save_directory = FPaths::ProjectUserDir();
+	scene_charge_directory = FPaths::ProjectUserDir();
 	screenshots_save_directory = FPaths::ProjectUserDir();
 	absolute_file_path = scene_save_directory + scene_folder + "/" + scene_file_name_prefix + ".txt";
 }
@@ -928,7 +929,7 @@ void AHSMTracker::RebuildModeBegin()
 	if (!scene_charged)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SPAWNEANDO LA ESCENA"));
-		scene_charged = JsonParser->LoadSceneFile(scene_save_directory + scene_folder + "/" + "scene_data.json",this);
+		scene_charged = JsonParser->LoadSceneFile(scene_charge_directory + scene_folder + "/" + scene_file_name + ".json",this);
 		//UE_LOG(LogTemp, Warning, TEXT("Scene chargeg value is: %s"), scene_charged ? TEXT("true") : TEXT("false"));
 	}
 

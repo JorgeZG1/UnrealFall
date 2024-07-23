@@ -69,6 +69,14 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FString scene_folder;
 
+	/* path of json to be charged */
+	UPROPERTY(EditAnywhere, Category = "JSON to Charge Gaussian Splat")
+	FString scene_charge_directory;
+
+	/* File name od scene to be spawned */
+	UPROPERTY(EditAnywhere, Category = "JSON to Charge Gaussian Splat")
+	FString scene_file_name;
+
 	/* Name prefix for the raw TXT scene files */
 	UPROPERTY(EditAnywhere, Category = Recording)
 	FString scene_file_name_prefix;

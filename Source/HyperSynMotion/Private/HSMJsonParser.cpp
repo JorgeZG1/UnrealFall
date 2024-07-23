@@ -226,9 +226,9 @@ bool HSMJsonParser::LoadSceneFile(FString JsonFilePath, UObject* hsmtracker)
 
 								//Set crop min property
 								FVector3f cropmin_value = FVector3f(
-									JsonObject->GetObjectField("scene")->GetObjectField("crop_bouding_box_min")->GetNumberField("x"),
-									JsonObject->GetObjectField("scene")->GetObjectField("crop_bouding_box_min")->GetNumberField("y"),
-									JsonObject->GetObjectField("scene")->GetObjectField("crop_bouding_box_min")->GetNumberField("z")
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bounding_box_min")->GetNumberField("x"),
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bounding_box_min")->GetNumberField("y"),
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bounding_box_min")->GetNumberField("z")
 								);
 								void* CropMinAddress = CropMin->ContainerPtrToValuePtr<void>(SpawnedActor);
 								FVector3f* CropMinVector = reinterpret_cast<FVector3f*>(CropMinAddress);
@@ -236,9 +236,9 @@ bool HSMJsonParser::LoadSceneFile(FString JsonFilePath, UObject* hsmtracker)
 
 								//Set crop max property
 								FVector3f cropmax_value = FVector3f(
-									JsonObject->GetObjectField("scene")->GetObjectField("crop_bouding_box_max")->GetNumberField("x"),
-									JsonObject->GetObjectField("scene")->GetObjectField("crop_bouding_box_max")->GetNumberField("y"),
-									JsonObject->GetObjectField("scene")->GetObjectField("crop_bouding_box_max")->GetNumberField("z")
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bounding_box_max")->GetNumberField("x"),
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bounding_box_max")->GetNumberField("y"),
+									JsonObject->GetObjectField("scene")->GetObjectField("crop_bounding_box_max")->GetNumberField("z")
 								);
 								void* CropMaxAddress = CropMax->ContainerPtrToValuePtr<void>(SpawnedActor);
 								FVector3f* CropMaxVector = reinterpret_cast<FVector3f*>(CropMaxAddress);
