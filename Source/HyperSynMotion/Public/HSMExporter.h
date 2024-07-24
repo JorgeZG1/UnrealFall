@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "GameFramework/Character.h"
 #include "Camera/CameraActor.h"
+#include "Camera/CameraComponent.h"
 #include "HSMExporter.generated.h"
 
 UCLASS()
@@ -48,23 +49,56 @@ private:
 	TArray<ActorType*> GetActorByType(const UWorld* currentworld)
 	{
 		TArray<ActorType*> ActorsOfType;
-
+		bool isgaussian = false;
 		// Iterar los actores del mundo filtrando por ActorType
 		for (TActorIterator<ActorType> It(currentworld); It; ++It)
 		{
 			ActorType* Actor = *It; // Aquí declaramos la variable Actor correctamente
+
+			UE_LOG(LogTemp, Warning, TEXT("Found Actor: %s and parent: %s"), *Actor->GetName(), *Actor->GetClass()->GetName());
 			//obtener los gaussian splat
 			if (Actor->IsA<AActor>())
 			{
 				if (Actor->GetClass()->GetName() == "MeetingRoom_GaussianSplatLuma_C") {
 					UE_LOG(LogTemp, Warning, TEXT("Found Actor: %s and parent: %s"), *Actor->GetName(), *Actor->GetClass()->GetName());
 					ActorsOfType.Add(Actor);
+					isgaussian = true;
+				}
+				else if (Actor->IsA<ACameraActor>() && Actor->GetClass()->GetName() == "CineCameraActor" && !isgaussian) {
+					//Camera
+					ActorsOfType.Add(Actor);
+				}
+				else if (Actor->IsA<ACharacter>() && Actor->GetClass()->GetSuperClass()->GetName() == "Character" && !isgaussian) {
+					//character
+					ActorsOfType.Add(Actor);
 				}
 			}
-			else {
-				ActorsOfType.Add(Actor);
-			}
-			
+			//else {
+			//	if (Actor->IsA<ACharacter>() && Actor->GetClass()->GetSuperClass()->GetName() == "Character") {
+			//		//character
+			//		ActorsOfType.Add(Actor);
+			//	}
+			//	else if (Actor->IsA<ACameraActor>() && Actor->GetClass()->GetName() == "CineCameraActor") {
+			//		
+			//	}
+			//}
+			//if (Actor->IsA<AActor>())
+			//{
+			//	if (Actor->GetClass()->GetName() == "MeetingRoom_GaussianSplatLuma_C") {
+			//		ActorsOfType.Add(Actor);
+			//	}
+			//}
+
+			//if (Actor->IsA<ACharacter>() && Actor->GetClass()->GetSuperClass()->GetName() == "Character") {
+			//	//only metahumans
+			//	ActorsOfType.Add(Actor);
+			//}
+
+			//if (Actor->IsA<ACameraActor>() && Actor->GetClass()->GetName() == "CineCameraActor")
+			//{
+			//	//only cameras
+			//	ActorsOfType.Add(Actor);
+			//}
 		}
 
 		return ActorsOfType;
@@ -73,9 +107,11 @@ private:
 	// Creation json files functions
 	void GenerateSceneJson(const UWorld* world, TArray<AActor*> scenes);
 
-	void GenerateCamerasJson(const UWorld* world, TArray<ACameraActor*> scenes);
+	TArray<TSharedPtr<FJsonValue>> GetArrayCameras(TArray<ACameraActor*> cameras);
+	void GenerateCamerasJson(const UWorld* world, TArray<ACameraActor*> cameras);
 
-	void GenerateMetaHumanJson(const UWorld* world, TArray<ACharacter*> scenes);
+	TArray<TSharedPtr<FJsonValue>> GetArrayMetahumans(TArray<ACharacter*> characters);
+	void GenerateMetaHumanJson(const UWorld* world, TArray<ACharacter*> characters);
 
-	void GenerateCamerasAndMetaHumanJson(const UWorld* world);
+	void GenerateCamerasAndMetaHumanJson(const UWorld* world, TArray<ACameraActor*> cameras, TArray<ACharacter*> characters);
 };
