@@ -28,14 +28,14 @@ void AHSMExporter::BeginPlay()
 		//scene
 		if (bScene)
 		{
-			TArray<AActor*> xd = GetActorByType<AActor>(world);
-			if (xd.IsEmpty()) {
+			TArray<AActor*> arrayscenes = GetActorByType<AActor>(world);
+			if (arrayscenes.IsEmpty()) {
 				UE_LOG(LogTemp, Warning, TEXT("ESTA VACÍO"));
 			}else{
 				UE_LOG(LogTemp, Warning, TEXT("ESTA LLENO"));
 			}
 			
-			GenerateSceneJson(world, xd);
+			GenerateSceneJson(world, arrayscenes);
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("Scene not choose to be generated"));
@@ -64,6 +64,14 @@ void AHSMExporter::Tick(float DeltaTime)
 
 }
 
+void AHSMExporter::Savejson(TSharedPtr<FJsonObject> RootObject, FString file_path)
+{
+	FString OutputString;
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
+	FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
+	FFileHelper::SaveStringToFile(OutputString, *file_path, FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), EFileWrite::FILEWRITE_None);
+}
+
 void AHSMExporter::GenerateSceneJson(const UWorld* world, TArray<AActor*> scenes)
 {
 	UE_LOG(LogTemp, Warning, TEXT("generate scene json"));
@@ -75,8 +83,6 @@ void AHSMExporter::GenerateSceneJson(const UWorld* world, TArray<AActor*> scenes
 		// Crear el objeto JSON para la escena
 		TSharedPtr<FJsonObject> SceneObject = MakeShareable(new FJsonObject());
 
-		// Nombre del actor (opcional, puedes cambiarlo por otro nombre relevante)
-		/*SceneObject->SetStringField(TEXT("name"), scene->GetName());*/
 		// Extraer el nombre del blueprint
 		FString BlueprintPath;
 		if (UBlueprintGeneratedClass* BlueprintClass = Cast<UBlueprintGeneratedClass>(scene->GetClass()))
@@ -176,11 +182,8 @@ void AHSMExporter::GenerateSceneJson(const UWorld* world, TArray<AActor*> scenes
 	}
 
 	// Convertir el objeto JSON a una cadena and save
-	FString OutputString;
-	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
-	FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
 	FString json_file_path = Output_path + "/" + file_name + "_scene.json";
-	FFileHelper::SaveStringToFile(OutputString, *json_file_path, FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), EFileWrite::FILEWRITE_None);
+	Savejson(RootObject, json_file_path);
 }
 
 TArray<TSharedPtr<FJsonValue>> AHSMExporter::GetArrayCameras(TArray<ACameraActor*> cameras)
@@ -240,11 +243,8 @@ void AHSMExporter::GenerateCamerasJson(const UWorld* world, TArray<ACameraActor*
 	RootObject->SetArrayField(TEXT("cameras"), CamerasArray);
 
 	// Convertir el objeto JSON a una cadena
-	FString OutputString;
-	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
-	FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
 	FString json_file_path = Output_path + "/" + file_name + "_cameras.json";
-	FFileHelper::SaveStringToFile(OutputString, *json_file_path, FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), EFileWrite::FILEWRITE_None);
+	Savejson(RootObject, json_file_path);
 }
 
 
@@ -345,11 +345,6 @@ void AHSMExporter::GenerateCamerasAndMetaHumanJson(const UWorld* world, TArray<A
 	RootObject->SetArrayField(TEXT("avatars"), GetArrayMetahumans(characters));
 
 	// Convertir el objeto JSON a una cadena
-	FString OutputString;
-	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
-	FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
-
-	// Guardar el archivo JSON
 	FString json_file_path = Output_path + "/" + file_name + "_sequence.json";
-	FFileHelper::SaveStringToFile(OutputString, *json_file_path, FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), EFileWrite::FILEWRITE_None);
+	Savejson(RootObject, json_file_path);
 }

@@ -73,38 +73,15 @@ private:
 					ActorsOfType.Add(Actor);
 				}
 			}
-			//else {
-			//	if (Actor->IsA<ACharacter>() && Actor->GetClass()->GetSuperClass()->GetName() == "Character") {
-			//		//character
-			//		ActorsOfType.Add(Actor);
-			//	}
-			//	else if (Actor->IsA<ACameraActor>() && Actor->GetClass()->GetName() == "CineCameraActor") {
-			//		
-			//	}
-			//}
-			//if (Actor->IsA<AActor>())
-			//{
-			//	if (Actor->GetClass()->GetName() == "MeetingRoom_GaussianSplatLuma_C") {
-			//		ActorsOfType.Add(Actor);
-			//	}
-			//}
-
-			//if (Actor->IsA<ACharacter>() && Actor->GetClass()->GetSuperClass()->GetName() == "Character") {
-			//	//only metahumans
-			//	ActorsOfType.Add(Actor);
-			//}
-
-			//if (Actor->IsA<ACameraActor>() && Actor->GetClass()->GetName() == "CineCameraActor")
-			//{
-			//	//only cameras
-			//	ActorsOfType.Add(Actor);
-			//}
 		}
 
 		return ActorsOfType;
 	}
 
 	// Creation json files functions
+
+	void Savejson(TSharedPtr<FJsonObject> rootObject, FString file_path);
+
 	void GenerateSceneJson(const UWorld* world, TArray<AActor*> scenes);
 
 	TArray<TSharedPtr<FJsonValue>> GetArrayCameras(TArray<ACameraActor*> cameras);
