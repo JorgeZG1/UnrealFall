@@ -56,25 +56,13 @@
 			]
 		},
 		{
-			"Name": "VisualStudioTools",
+			"Name": "XV3dGS",
 			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/362651520df94e4fa65492dbcba44ae2",
-			"SupportedTargetPlatforms": [
-				"Win64"
-			]
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/d186799254dc405f9bde7a2a81b34733"
 		},
 		{
 			"Name": "NeuronLiveLink",
 			"Enabled": true
-		},
-		{
-			"Name": "NeuronRetargeting",
-			"Enabled": true
-		},
-		{
-			"Name": "XV3dGS",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/d186799254dc405f9bde7a2a81b34733"
 		}
 	]
 }
